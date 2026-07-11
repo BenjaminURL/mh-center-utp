@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTP - Inicio de Sesión</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="background-section">
+            <div class="top-logo" id="main-top-logo">
+                <img src="./images/logoUTPsimple.jpg" alt="Logo UTP">
+                <div class="logo-text">
+                    <span>UNIVERSIDAD TECNOLÓGICA DE PANAMÁ</span>
+                    <span class="sub-text">Dirección de Orientación Psicológica</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <div class="welcome-card">
+                
+                <div class="card-logo">
+                    <img src="./images/logoUTPsimple.jpg" alt="UTP Logo">
+                </div>
+
+                <div class="card-content active" id="view-welcome">
+                    <h1 class="welcome-title">Bienvenido</h1>
+                    <div class="button-group">
+                        <button class="btn btn-secondary" id="btn-login-trigger">Iniciar sesión</button>
+                        <div class="divider"><span class="circle"></span></div>
+                        <button class="btn btn-primary" id="btn-register-trigger">Registrarse</button>
+                    </div>
+                </div>
+
+                <div class="card-content" id="view-login">
+                    <h1 class="welcome-title small-margin">Iniciar sesión</h1>
+                    <form class="login-form" id="form-login">
+                        <div class="input-group">
+                            <label>Ingrese la Cédula</label>
+                            <input type="text" placeholder="X-XXXX-XXXXX" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Contraseña</label>
+                            <input type="password" placeholder="**********" required>
+                        </div>
+                        <div class="button-group form-buttons">
+                            <button type="submit" class="btn btn-primary compact-btn">Iniciar sesión</button>
+                            <button type="button" class="btn btn-secondary compact-btn" id="btn-back-login">Salir</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-content" id="view-register">
+                    <h1 class="welcome-title small-margin">Registrarse</h1>
+                    <form class="login-form" id="form-registro">
+                        <div class="input-group">
+                            <label>Ingrese la Cédula</label>
+                            <input type="text" placeholder="XX-XXXX-XXXXX" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Nombre y apellido</label>
+                            <input type="text" placeholder="Nombre Apellido" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Correo institucional</label>
+                            <input type="email" placeholder="nombre@utp.ac.pa" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Contraseña</label>
+                            <input type="password" placeholder="**********" required>
+                        </div>
+                        <div class="button-group form-buttons">
+                            <button type="submit" class="btn btn-primary compact-btn">Registrarse</button>
+                            <button type="button" class="btn btn-secondary compact-btn" id="btn-back-register">Salir</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-content success-container" id="view-success">
+                    <div class="success-icon-circle">
+                        <span>✓</span>
+                    </div>
+                    <p class="success-text">¡Registro Completado!</p>
+                    <p class="success-subtext">Redirigiendo a tu panel...</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+/* Estilos específicos para el panel de anotaciones - Versión Simplificada */
+.annotations-main-card {
+  width: 100%;
+  padding: 32px !important;
+  min-height: 500px;
+  background: #ffffff;
+}
+
+.annotations-layout {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.annotations-sidebar {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 380px;
+}
+
+.annotations-content {
+  flex: 2 1 450px;
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Identidad y Tags */
+.section-main-title {
+  margin-bottom: 6px;
+  font-size: 24px !important;
+  color: #1f2937;
+}
+
+.confidential-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 500;
+  background: #fef2f2;
+  padding: 4px 10px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.lock-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+}
+
+/* Botones de acción de la izquierda - Estilo UTP */
+.action-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-action {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 25px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  color: var(--primary, #4F46E5);
+  border: 2px solid var(--primary, #4F46E5);
+}
+
+.btn-action.active, .btn-action:hover {
+  background: var(--primary, #4F46E5);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
+}
+
+.btn-back-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #111827;
+  background: #ffffff;
+  border: 2px solid #111827;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.btn-back-menu:hover {
+  background: #111827;
+  color: #ffffff;
+}
+
+.btn-back-menu svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Paneles de Contenido de la Derecha */
+.sub-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sub-panel.active {
+  display: flex;
+}
+
+.sub-panel-title {
+  font-size: 18px;
+  color: #374151;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.main-textarea {
+  width: 100%;
+  min-height: 240px;
+  padding: 16px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: none;
+  background: #ffffff;
+  transition: border-color 0.15s;
+}
+
+.main-textarea:focus {
+  outline: none;
+  border-color: var(--primary, #4F46E5);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-submit {
+  background: var(--primary, #4F46E5);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.15s;
+}
+
+.btn-submit:hover {
+  background: var(--primary-dark, #3730A3);
+}
+
+/* Lista de Notas Guardadas */
+.notes-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.note-item {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid var(--primary, #4F46E5);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.note-item p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #4b5563;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.btn-delete-card {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.btn-delete-card:hover { opacity: 1; }
+.btn-delete-card svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* --- ESTILOS COMPLEMENTARIOS PARA EL MÓDULO DE REGISTROS --- */
+
+/* Formulario */
+.records-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1 1 200px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  padding: 10px 14px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  background: #ffffff;
+  color: #111827;
+  transition: border-color 0.15s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary, #4F46E5);
+}
+
+.form-group textarea {
+  min-height: 110px;
+  resize: none;
+}
+
+/* Tabla de Registros */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.records-table th {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 12px 14px;
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.records-table td {
+  padding: 12px 14px;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.records-table tr:last-child td {
+  border-bottom: none;
+}
+
+.records-table tr:hover {
+  background: #f9fafb;
+}
+
+/* Botón de eliminar en tabla */
+.btn-table-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.btn-table-delete:hover {
+  background: #ffeeee;
+}
+
+.btn-table-delete svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* --- MENÚ CONTEXTUAL FLOTANTE --- */
+.context-menu {
+  display: none;
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 9999;
+  width: 220px;
+  padding: 6px 0;
+  animation: fadeInMenu 0.1s ease-out;
+}
+
+@keyframes fadeInMenu {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.context-menu-item {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.context-menu-item:hover {
+  background: var(--primary, #4F46E5);
+  color: #ffffff;
+}
+
+.context-menu-item svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* Fila seleccionada por clic derecho */
+.records-table tr.context-selected {
+  background: #e0f2fe !important;
+}
+
+.records-table tbody tr {
+  cursor: context-menu; /* Cambia el cursor para indicar que admite clic derecho */
+  transition: background 0.15s;
+}

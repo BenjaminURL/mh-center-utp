@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendar Cita · UTP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/utp_agendar.css">
+</head>
+<body>
+
+<div class="card" id="main-card">
+
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="check-circle">✓</div>
+    <div class="confirm-title">¡Cita confirmada!</div>
+    <div class="confirm-card">
+      <div class="doc-name" id="conf-doc">Dr. Cui Hernandez</div>
+      <div class="confirm-row">
+        <span class="icon">👤</span>
+        <div><div class="info-lbl">Paciente</div><div class="info-val" id="conf-pac">Usuario</div></div>
+      </div>
+      <div class="confirm-row">
+        <span class="icon">📅</span>
+        <div><div class="info-lbl">Fecha</div><div class="info-val" id="conf-fecha">—</div></div>
+      </div>
+      <div class="confirm-row">
+        <span class="icon">🕐</span>
+        <div><div class="info-lbl">Hora</div><div class="info-val" id="conf-hora">—</div></div>
+      </div>
+    </div>
+    <button class="btn-menu" id="btn-menu-go">Menú</button>
+    <p class="confirm-note">Usted recibirá un recordatorio en su email en las siguientes 24 horas.</p>
+  </div>
+
+  <a class="back" href="./dashboard.html">← Regresar</a>
+
+  <div class="psic-nav">
+    <button id="btn-prev-psic">←</button>
+    <span id="psic-name">Cui Hernandez</span>
+    <button id="btn-next-psic">→</button>
+  </div>
+
+  <div class="month-nav">
+    <button id="btn-prev-month">←</button>
+    <span id="month-label">April 2026</span>
+    <button id="btn-next-month">→</button>
+  </div>
+
+  <div class="cal">
+    <div class="cal-head">
+      <div class="cal-head-cell">Sun</div>
+      <div class="cal-head-cell">Mon</div>
+      <div class="cal-head-cell">Tue</div>
+      <div class="cal-head-cell">Wed</div>
+      <div class="cal-head-cell">Thu</div>
+      <div class="cal-head-cell">Fri</div>
+      <div class="cal-head-cell">Sat</div>
+    </div>
+    <div class="cal-body" id="cal-body"></div>
+  </div>
+
+  <div class="slots-section" id="slots-section" style="display:none">
+    <div class="slots-title">Available Time Slots</div>
+    <div class="slots-grid" id="slots-grid"></div>
+  </div>
+
+  <button class="btn-continuar" id="btn-continuar">Continuar</button>
+
+</div>
+
+<script src="js/utp_agendar.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body, html {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f7f6f9;
+    color: #111518;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-icon-container {
+    background-color: #5f1865;
+    color: #ffffff;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(95, 24, 101, 0.2);
+}
+
+.book-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.header-titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.univ-title {
+    font-size: 0.8rem;
+    color: #666e75;
+    font-weight: 500;
+}
+
+.dept-title {
+    font-size: 0.95rem;
+    color: #c00096;
+    font-weight: 700;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #c00096;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+    transform: scale(1.08);
+}
+
+.bell-icon {
+    width: 40px;
+    height: 35px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #c00096;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(192, 0, 150, 0.2);
+}
+
+.main-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 50px 50px;
+}
+
+.welcome-section {
+    margin-bottom: 40px;
+}
+
+.user-greeting {
+    font-size: 1.05rem;
+    color: #22252a;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.page-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #000000;
+    letter-spacing: -0.5px;
+}
+
+.dashboard-grid {
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+}
+
+.action-card {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 30px;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #182026;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    font-size: 1.05rem;
+    color: #616b74;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.card-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+}
+
+.btn-purple {
+    background-color: #5f1865;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(95, 24, 101, 0.15);
+}
+
+.btn-purple:hover {
+    background-color: #4b1250;
+    box-shadow: 0 10px 24px rgba(95, 24, 101, 0.25);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #5f1865;
+    border: 1px solid #e1d3e3;
+}
+
+.btn-outline:hover {
+    background-color: #fcf8fd;
+    border-color: #5f1865;
+}
+
+.btn:active {
+    transform: scale(0.99);
+}
+
+.image-card {
+    flex: 1.1;
+    background-color: #ffffff;
+    border-radius: 30px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+}
+
+.panel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+@media (max-width: 992px) {
+    .main-header {
+        padding: 15px 25px;
+    }
+    
+    .main-content {
+        padding: 30px 25px;
+    }
+
+    .dashboard-grid {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .action-card {
+        padding: 35px 25px;
+    }
+
+    .image-card {
+        height: 350px;
+    }
+}

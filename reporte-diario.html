@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Reporte Diario</title>
+  <link rel="stylesheet" href="css/reporteDiario.css" />
+</head>
+<body>
+  <main class="report-page">
+    <a class="back-link" href="psicologo.html">← Regresar</a>
+
+    <section class="report-card">
+      <header class="report-header">
+        <h1>Mi Reporte Diario</h1>
+
+        <div class="report-date">
+          <span>Fecha de reporte</span>
+          <strong id="reportDate">--/--/----</strong>
+          <span class="calendar-icon">▣</span>
+        </div>
+      </header>
+
+      <div class="info-alert" id="infoAlert">
+        <span class="alert-icon">i</span>
+        <div>
+          <strong>Aún no has registrado un reporte para hoy.</strong>
+          <p>Completa la información de las actividades diarias.</p>
+        </div>
+      </div>
+
+      <div class="error-alert" id="errorAlert">
+        <span class="error-icon">!</span>
+        <div>
+          <strong>Completa los siguientes errores para enviar el reporte.</strong>
+          <p id="errorMessage">Debes agregar al menos una actividad.</p>
+        </div>
+      </div>
+
+      <section class="report-section">
+        <h2>Información general</h2>
+
+        <label class="field-label" for="psychologistName">Psicólogo(a)</label>
+        <input
+          id="psychologistName"
+          class="readonly-input"
+          type="text"
+          value="Dr. Cui Hernández"
+          readonly
+        />
+      </section>
+
+      <section class="report-section">
+        <h2>Actividades realizadas</h2>
+
+        <div class="activities-table">
+          <div class="activities-header">
+            <span>#</span>
+            <span>Tipo de actividad</span>
+            <span>Descripción</span>
+            <span>Duración</span>
+            <span>Observaciones</span>
+            <span>Acciones</span>
+          </div>
+
+          <div id="activitiesBody"></div>
+
+          <div class="empty-activities" id="emptyActivities">
+            <div class="empty-icon">▱</div>
+            <strong>Aún no has agregado actividades.</strong>
+            <p>Agrega al menos una actividad para continuar.</p>
+          </div>
+        </div>
+
+        <button class="add-activity-btn" type="button" id="addActivityBtn">
+          + Agregar actividad
+        </button>
+      </section>
+
+      <section class="report-section">
+        <h2>Observaciones generales del día</h2>
+
+        <textarea
+          id="generalObservations"
+          class="general-observations"
+          placeholder="Escribe tus observaciones generales aquí..."
+        ></textarea>
+
+        <p class="field-error" id="generalError">Este campo es obligatorio.</p>
+      </section>
+
+      <div class="report-actions">
+        <button class="btn-primary report-save-btn" type="button" id="saveReportBtn">
+          Guardar reporte
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <div class="report-modal-overlay" id="confirmModal">
+    <div class="report-modal">
+      <div class="success-icon">✓</div>
+
+      <h2>¿Enviar Reporte diario?</h2>
+
+      <p>
+        Una vez enviado el reporte, quedará registrado para la fecha
+        <span id="modalDate">--/--/----</span>
+      </p>
+
+      <div class="modal-actions">
+        <button class="modal-cancel" type="button" id="cancelSendBtn">
+          Cancelar
+        </button>
+
+        <button class="modal-send" type="button" id="confirmSendBtn">
+          Enviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-modal-overlay" id="successModal">
+    <div class="report-modal">
+      <div class="success-icon">✓</div>
+
+      <h2>Reporte enviado correctamente</h2>
+
+      <p>Las actividades diarias fueron registradas con éxito.</p>
+
+      <div class="modal-actions single-action">
+        <button class="modal-send" type="button" id="closeSuccessBtn">
+          Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/reporte-diario.js"></script>
+</body>
+</html>

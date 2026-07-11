@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registros - Orientación Psicológica</title>
+  <link rel="stylesheet" href="./css/psicologo.css" />
+  <link rel="stylesheet" href="./css/psicologo_panel_ext.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">UTP</div>
+      <div>
+        <div class="brand-title">Universidad Tecnológica de Panamá</div>
+        <div class="brand-subtitle">Dirección de Orientación Psicológica</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="profile-circle" aria-label="Perfil">
+        <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="page">
+    <article class="card annotations-main-card">
+      
+      <div class="annotations-layout">
+        <div class="annotations-sidebar">
+          <div class="header-block">
+            <h1 class="hero-title section-main-title" id="main-panel-title">Registros</h1>
+            <p class="confidential-tag" id="panel-tag" style="background: #e0f2fe; color: #0369a1;">
+              <svg viewBox="0 0 24 24" class="lock-icon" style="stroke: #0369a1; fill: none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              Expedientes Clínicos
+            </p>
+          </div>
+
+          <div class="action-buttons-stack">
+            <button type="button" class="btn-action active" id="tab-new-reg-btn">
+              Nuevo registro
+            </button>
+            <button type="button" class="btn-action" id="tab-view-reg-btn">
+              Acceder a registros
+            </button>
+            
+            <a href="psicologo.html" class="btn-back-menu">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              Regresar al Menú
+            </a>
+          </div>
+        </div>
+
+        <div class="annotations-content">
+          
+          <div id="panel-new-register" class="sub-panel active">
+            <h2 class="sub-panel-title">Crear Nuevo Registro Clínico</h2>
+            <form id="form-registro" class="records-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reg-cedula">Cédula del Estudiante</label>
+                  <input type="text" id="reg-cedula" placeholder="0-000-0000" required>
+                </div>
+                <div class="form-group">
+                  <label for="reg-nombre">Nombre Completo</label>
+                  <input type="text" id="reg-nombre" placeholder="Nombre y Apellido" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reg-facultad">Facultad</label>
+                  <select id="reg-facultad">
+                    <option value="FISC">FISC - Ing. de Sistemas Computacionales</option>
+                    <option value="FIE">FIE - Ingeniería Eléctrica</option>
+                    <option value="FIC">FIC - Ingeniería Civil</option>
+                    <option value="FIM">FIM - Ingeniería Mecánica</option>
+                    <option value="FII">FII - Ingeniería Industrial</option>
+                    <option value="FATOU">FATOU - Ciencias y Tecnología</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="reg-motivo">Motivo de Consulta</label>
+                  <input type="text" id="reg-motivo" placeholder="Ej. Ansiedad, Estrés..." required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="reg-observaciones">Observaciones y Diagnóstico Preliminar</label>
+                <textarea id="reg-observaciones" placeholder="Detalles clínicos iniciales del caso..." required></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-submit">Guardar Registro</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="panel-view-registers" class="sub-panel">
+            <h2 class="sub-panel-title">Base de Datos de Atenciones</h2>
+            <div class="table-responsive">
+              <table class="records-table">
+                <thead>
+                  <tr>
+                    <th>Cédula</th>
+                    <th>Estudiante</th>
+                    <th>Facultad</th>
+                    <th>Motivo</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body-registers">
+                  </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="panel-create-context-note" class="sub-panel">
+            <h2 class="sub-panel-title" id="create-note-title">Nueva Anotación Privada</h2>
+            <div class="form-group">
+              <textarea id="textarea-context-note" class="main-textarea" placeholder="Escribe aquí notas rápidas o apuntes confidenciales sobre la sesión..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="btn-save-context-note" class="btn-submit">Guardar Anotación</button>
+            </div>
+          </div>
+
+          <div id="panel-view-context-notes" class="sub-panel">
+            <h2 class="sub-panel-title" id="view-notes-title">Historial de Anotaciones Privadas</h2>
+            <div id="context-notes-list" class="notes-scroll-list">
+              </div>
+          </div>
+
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <div id="custom-context-menu" class="context-menu">
+    <button type="button" class="context-menu-item" id="ctx-create-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Crear anotación privada
+    </button>
+    <button type="button" class="context-menu-item" id="ctx-view-notes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      Ver anotación privada
+    </button>
+  </div>
+
+  <script src="./js/registro.js"></script>
+</body>
+</html>

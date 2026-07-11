@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendario de disponibilidad</title>
+  <link rel="stylesheet" href="./css/psicologo.css" />
+</head>
+<body>
+  <main class="availability-page">
+    <section class="availability-header">
+      <div>
+        <h1>Calendario de disponibilidad</h1>
+        <p>Establece horarios en los que puedes aceptar citas sin interrupciones.</p>
+      </div>
+
+      <div class="week-control">
+        <span id="weekLabel">Semana actual</span>
+        <button type="button" id="prevWeek" aria-label="Semana anterior">‹</button>
+        <button type="button" id="nextWeek" aria-label="Semana siguiente">›</button>
+    </div>
+    </section>
+
+    <section class="schedule-card">
+      <div class="schedule-grid">
+        <div class="cell header-cell empty-cell"></div>
+
+        <div class="cell header-cell">
+            <strong id="dayName0">Lunes</strong>
+            <span id="dayDate0">--</span>
+        </div>
+
+        <div class="cell header-cell">
+            <strong id="dayName1">Martes</strong>
+            <span id="dayDate1">--</span>
+        </div>
+
+        <div class="cell header-cell">
+            <strong id="dayName2">Miércoles</strong>
+            <span id="dayDate2">--</span>
+        </div>
+
+        <div class="cell header-cell">
+            <strong id="dayName3">Jueves</strong>
+            <span id="dayDate3">--</span>
+        </div>
+
+        <div class="cell header-cell">
+            <strong id="dayName4">Viernes</strong>
+            <span id="dayDate4">--</span>
+        </div>
+
+        <!-- 8:00 AM -->
+        <div class="cell time-cell">8:00 AM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 9:00 AM -->
+        <div class="cell time-cell">9:00 AM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 10:00 AM -->
+        <div class="cell time-cell">10:00 AM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 11:00 AM -->
+        <div class="cell time-cell">11:00 AM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 12:00 PM bloqueado -->
+        <div class="cell time-cell">12:00 PM</div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+
+        <!-- 1:00 PM -->
+        <div class="cell time-cell">1:00 PM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 2:00 PM -->
+        <div class="cell time-cell">2:00 PM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 3:00 PM -->
+        <div class="cell time-cell">3:00 PM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 4:00 PM -->
+        <div class="cell time-cell">4:00 PM</div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+
+        <!-- 5:00 PM -->
+        <div class="cell time-cell">5:00 PM</div>
+        <div class="cell blocked"></div>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <button class="cell slot" type="button"></button>
+        <div class="cell blocked"></div>
+
+        <!-- 6:00 PM bloqueado -->
+        <div class="cell time-cell">6:00 PM</div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+        <div class="cell blocked"></div>
+      </div>
+    </section>
+
+    <section class="availability-actions">
+      <a class="btn-secondary" href="psicologo.html">Cancelar</a>
+      <button class="btn-primary" type="button" id="saveAvailability">
+        Guardar disponibilidad
+      </button>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="successModal">
+    <div class="success-modal">
+      <div class="success-icon">✓</div>
+      <h2>Cambios guardados con éxito!</h2>
+      <button type="button" id="closeModal">Listo</button>
+    </div>
+  </div>
+
+  <script src="js/calendario-disponibilidad.js"></script>
+</body>
+</html>
