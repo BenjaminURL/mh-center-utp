@@ -1,82 +1,90 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Referencias de las vistas de la tarjeta
-    const viewWelcome = document.getElementById('view-welcome');
-    const viewLogin = document.getElementById('view-login');
-    const viewRegister = document.getElementById('view-register');
-    const viewSuccess = document.getElementById('view-success');
-    
-    // Botones de acción
-    const btnLoginTrigger = document.getElementById('btn-login-trigger');
-    const btnRegisterTrigger = document.getElementById('btn-register-trigger');
-    const btnBackLogin = document.getElementById('btn-back-login');
-    const btnBackRegister = document.getElementById('btn-back-register');
-    
-    // Formularios
     const formLogin = document.getElementById('form-login');
-    const formRegistro = document.getElementById('form-registro');
-    const topLogo = document.getElementById('main-top-logo');
+    const inputCedula = document.getElementById('login-cedula');
+    const inputPassword = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    const credentialOptions = document.querySelectorAll('.credential-option');
 
-    // --- FLUJO DE INICIAR SESIÓN ---
-    
-    // 1. Mostrar formulario de Login
-    btnLoginTrigger.addEventListener('click', () => {
-        viewWelcome.classList.remove('active');
-        viewLogin.classList.add('active');
-        
-        // Ocultar logo exterior en móviles/tabletas si es necesario
-        if (topLogo && window.innerWidth > 992) {
-            topLogo.style.opacity = '0';
+    const USUARIO_ACTIVO_KEY = 'usuarioActivo';
+
+    // Credenciales fijas para la demostración del prototipo.
+    const usuarios = [
+        {
+            cedula: '8-111-111',
+            password: '1234',
+            nombre: 'Estudiante de prueba',
+            correo: 'estudiante@utp.ac.pa',
+            rol: 'estudiante',
+            redirect: 'dashboard.html'
+        },
+        {
+            cedula: '8-222-222',
+            password: '1234',
+            nombre: 'Psicólogo de prueba',
+            correo: 'psicologo@utp.ac.pa',
+            rol: 'psicologo',
+            redirect: 'psicologo.html'
         }
+    ];
+
+    const normalizarCedula = (valor) => (valor || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+
+    const mostrarError = (mensaje) => {
+        loginError.textContent = mensaje;
+    };
+
+    const limpiarError = () => {
+        loginError.textContent = '';
+    };
+
+    const guardarUsuarioActivo = (usuario) => {
+        localStorage.setItem(USUARIO_ACTIVO_KEY, JSON.stringify({
+            cedula: usuario.cedula,
+            nombre: usuario.nombre,
+            correo: usuario.correo,
+            rol: usuario.rol
+        }));
+    };
+
+    credentialOptions.forEach((option) => {
+        option.addEventListener('click', () => {
+            inputCedula.value = option.dataset.cedula || '';
+            inputPassword.value = option.dataset.password || '';
+            limpiarError();
+            inputPassword.focus();
+        });
     });
 
-    // 2. Botón Salir desde Login (Regresa a Bienvenida)
-    btnBackLogin.addEventListener('click', () => {
-        viewLogin.classList.remove('active');
-        viewWelcome.classList.add('active');
-        
-        if (topLogo && window.innerWidth > 992) {
-            topLogo.style.opacity = '1';
+    inputCedula.addEventListener('input', limpiarError);
+    inputPassword.addEventListener('input', limpiarError);
+
+    formLogin.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const cedulaIngresada = normalizarCedula(inputCedula.value);
+        const passwordIngresado = inputPassword.value.trim();
+
+        if (!cedulaIngresada || !passwordIngresado) {
+            mostrarError('Ingrese la cédula y la contraseña.');
+            return;
         }
-    });
 
-    formLogin.addEventListener('submit', (e) => {
-        e.preventDefault();
-        window.location.href = 'psicologo.html';
-    });
+        const usuarioEncontrado = usuarios.find((usuario) => (
+            normalizarCedula(usuario.cedula) === cedulaIngresada
+            && usuario.password === passwordIngresado
+        ));
 
-
-    // --- FLUJO DE REGISTRO ---
-
-    // 4. Mostrar formulario de Registro
-    btnRegisterTrigger.addEventListener('click', () => {
-        viewWelcome.classList.remove('active');
-        viewRegister.classList.add('active');
-        
-        if (topLogo && window.innerWidth > 992) {
-            topLogo.style.opacity = '0';
+        if (!usuarioEncontrado) {
+            mostrarError('Cédula o contraseña incorrecta. Verifique las credenciales.');
+            inputPassword.value = '';
+            inputPassword.focus();
+            return;
         }
-    });
 
-    // 5. Botón Salir desde Registro (Regresa a Bienvenida)
-    btnBackRegister.addEventListener('click', () => {
-        viewRegister.classList.remove('active');
-        viewWelcome.classList.add('active');
-        
-        if (topLogo && window.innerWidth > 992) {
-            topLogo.style.opacity = '1';
-        }
-    });
-
-    // 6. Enviar Formulario de Registro (Muestra éxito y luego redirige)
-    formRegistro.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        viewRegister.classList.remove('active');
-        viewSuccess.classList.add('active');
-
-        // Retraso de 2.5 segundos para animación del check verde
-        setTimeout(() => {
-            window.location.href = 'dashboard.html'; 
-        }, 2500);
+        guardarUsuarioActivo(usuarioEncontrado);
+        window.location.href = usuarioEncontrado.redirect;
     });
 });

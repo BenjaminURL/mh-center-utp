@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registros - Orientación Psicológica</title>
+  <title>Anotaciones Privadas - Orientación Psicológica</title>
   <link rel="stylesheet" href="./css/psicologo.css" />
   <link rel="stylesheet" href="./css/psicologo_panel_ext.css" />
 </head>
@@ -25,25 +25,23 @@
 
   <main class="page">
     <article class="card annotations-main-card">
-      
       <div class="annotations-layout">
         <div class="annotations-sidebar">
           <div class="header-block">
-            <h1 class="hero-title section-main-title" id="main-panel-title">Registros</h1>
-            <p class="confidential-tag" id="panel-tag" style="background: #e0f2fe; color: #0369a1;">
-              <svg viewBox="0 0 24 24" class="lock-icon" style="stroke: #0369a1; fill: none;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              Expedientes Clínicos
+            <h1 class="hero-title section-main-title" id="main-panel-title">Anotaciones privadas</h1>
+            <p class="confidential-tag" id="panel-tag" style="background: #fef2f2; color: #ef4444;">
+              <svg viewBox="0 0 24 24" class="lock-icon" style="stroke: #ef4444; fill: none;">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Expediente confidencial
+            </p>
+            <p style="margin-top: 12px; color: #6b7280; font-size: 14px; line-height: 1.5;">
+              Selecciona un estudiante para crear o consultar sus anotaciones privadas.
             </p>
           </div>
 
           <div class="action-buttons-stack">
-            <button type="button" class="btn-action active" id="tab-new-reg-btn">
-              Nuevo registro
-            </button>
-            <button type="button" class="btn-action" id="tab-view-reg-btn">
-              Acceder a registros
-            </button>
-            
             <a href="psicologo.html" class="btn-back-menu">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
               Regresar al Menú
@@ -52,51 +50,7 @@
         </div>
 
         <div class="annotations-content">
-          
-          <div id="panel-new-register" class="sub-panel active">
-            <h2 class="sub-panel-title">Crear Nuevo Registro Clínico</h2>
-            <form id="form-registro" class="records-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="reg-cedula">Cédula del Estudiante</label>
-                  <input type="text" id="reg-cedula" placeholder="0-000-0000" required>
-                </div>
-                <div class="form-group">
-                  <label for="reg-nombre">Nombre Completo</label>
-                  <input type="text" id="reg-nombre" placeholder="Nombre y Apellido" required>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="reg-facultad">Facultad</label>
-                  <select id="reg-facultad">
-                    <option value="FISC">FISC - Ing. de Sistemas Computacionales</option>
-                    <option value="FIE">FIE - Ingeniería Eléctrica</option>
-                    <option value="FIC">FIC - Ingeniería Civil</option>
-                    <option value="FIM">FIM - Ingeniería Mecánica</option>
-                    <option value="FII">FII - Ingeniería Industrial</option>
-                    <option value="FATOU">FATOU - Ciencias y Tecnología</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="reg-motivo">Motivo de Consulta</label>
-                  <input type="text" id="reg-motivo" placeholder="Ej. Ansiedad, Estrés..." required>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="reg-observaciones">Observaciones y Diagnóstico Preliminar</label>
-                <textarea id="reg-observaciones" placeholder="Detalles clínicos iniciales del caso..." required></textarea>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn-submit">Guardar Registro</button>
-              </div>
-            </form>
-          </div>
-
-          <div id="panel-view-registers" class="sub-panel">
+          <div id="panel-view-registers" class="sub-panel active">
             <h2 class="sub-panel-title">Base de Datos de Atenciones</h2>
             <div class="table-responsive">
               <table class="records-table">
@@ -104,12 +58,9 @@
                   <tr>
                     <th>Cédula</th>
                     <th>Estudiante</th>
-                    <th>Facultad</th>
-                    <th>Motivo</th>
                   </tr>
                 </thead>
-                <tbody id="table-body-registers">
-                  </tbody>
+                <tbody id="table-body-registers"></tbody>
               </table>
             </div>
           </div>
@@ -119,17 +70,19 @@
             <div class="form-group">
               <textarea id="textarea-context-note" class="main-textarea" placeholder="Escribe aquí notas rápidas o apuntes confidenciales sobre la sesión..."></textarea>
             </div>
-            <div class="form-actions">
+            <div class="form-actions form-actions-between">
+              <button type="button" id="btn-back-from-create" class="btn-secondary-panel">Volver a estudiantes</button>
               <button type="button" id="btn-save-context-note" class="btn-submit">Guardar Anotación</button>
             </div>
           </div>
 
           <div id="panel-view-context-notes" class="sub-panel">
-            <h2 class="sub-panel-title" id="view-notes-title">Historial de Anotaciones Privadas</h2>
-            <div id="context-notes-list" class="notes-scroll-list">
-              </div>
+            <div class="panel-title-row">
+              <h2 class="sub-panel-title" id="view-notes-title">Historial de Anotaciones Privadas</h2>
+              <button type="button" id="btn-back-from-view" class="btn-secondary-panel btn-small-back">Volver a estudiantes</button>
+            </div>
+            <div id="context-notes-list" class="notes-scroll-list"></div>
           </div>
-
         </div>
       </div>
     </article>

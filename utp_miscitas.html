@@ -53,51 +53,12 @@
       <button class="filter-tab on" data-filter="todas">Todas</button>
       <button class="filter-tab" data-filter="agendada">Agendadas</button>
       <button class="filter-tab" data-filter="pendiente">Pendientes</button>
-      <button class="filter-tab" data-filter="completada">Completadas</button>
+      <button class="filter-tab" data-filter="atendida">Atendidas</button>
       <button class="filter-tab" data-filter="cancelada">Canceladas</button>
     </div>
 
     <div class="cita-list" id="cita-list"></div>
   </main>
-
-  <div class="overlay" id="ov-detail">
-    <div class="modal">
-      <button class="modal-close" id="btn-close-detail">✕</button>
-      <div class="modal-header">
-        <h2>Detalle de la Cita</h2>
-        <p id="det-id" style="color:var(--gray-400); font-size:11px"></p>
-      </div>
-      <div class="detail-card">
-        <div class="detail-doc" id="det-doc"></div>
-        <div class="detail-row">
-          <span class="detail-icon">📅</span>
-          <div><div class="detail-lbl">Fecha</div><div class="detail-val" id="det-fecha"></div></div>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">🕐</span>
-          <div><div class="detail-lbl">Hora</div><div class="detail-val" id="det-hora"></div></div>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">👤</span>
-          <div><div class="detail-lbl">Psicólogo</div><div class="detail-val" id="det-psic"></div></div>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">🏷</span>
-          <div><div class="detail-lbl">Estado</div><div id="det-estado"></div></div>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">📝</span>
-          <div><div class="detail-lbl">Motivo</div><div class="detail-val" id="det-motivo"></div></div>
-        </div>
-        <div class="detail-row" id="det-note-row" style="display:none">
-          <span class="detail-icon">💬</span>
-          <div><div class="detail-lbl">Nota</div><div class="detail-val" id="det-note" style="color:var(--gray-500); font-style:italic"></div></div>
-        </div>
-      </div>
-      <div class="modal-actions" id="det-actions"></div>
-    </div>
-  </div>
-
   <div class="overlay" id="ov-del">
     <div class="del-modal">
       <div class="del-icon">🗑️</div>

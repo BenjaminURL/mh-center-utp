@@ -1,202 +1,287 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Selectores de Panel y Menú Lateral
-  const tabNewBtn = document.getElementById('tab-new-reg-btn');
-  const tabViewBtn = document.getElementById('tab-view-reg-btn');
   const panels = document.querySelectorAll('.sub-panel');
   const mainTitle = document.getElementById('main-panel-title');
   const panelTag = document.getElementById('panel-tag');
-
-  // Selectores Contextuales (Menú Flotante)
   const contextMenu = document.getElementById('custom-context-menu');
   const tableBody = document.getElementById('table-body-registers');
-  
-  // Variables de Estado de Selección
+  const btnCreateNote = document.getElementById('ctx-create-note');
+  const btnViewNotes = document.getElementById('ctx-view-notes');
+  const btnSaveNote = document.getElementById('btn-save-context-note');
+  const btnBackFromCreate = document.getElementById('btn-back-from-create');
+  const btnBackFromView = document.getElementById('btn-back-from-view');
+  const textareaNote = document.getElementById('textarea-context-note');
+
+  const REGISTROS_KEY = 'utp_psic_registros';
+  const NOTAS_KEY = 'utp_psic_notas_vinculadas';
+  const USUARIOS_KEY = 'usuariosRegistrados';
+  const USUARIO_ACTIVO_KEY = 'usuarioActivo';
+  const CITAS_KEY = 'utp_citas';
+
+  const REGISTROS_PREDETERMINADOS = new Set([
+    '8-954-1234',
+    '3-745-8965',
+    '9-762-4321'
+  ]);
+
   let selectedStudentCedula = null;
   let selectedStudentName = null;
 
-  // Cargar Base de Datos desde LocalStorage
-  let records = JSON.parse(localStorage.getItem('utp_psic_registros')) || [];
-  let notes = JSON.parse(localStorage.getItem('utp_psic_notas_vinculadas')) || [];
+  let records = [];
+  let notes = leerJson(NOTAS_KEY, []);
 
-  // DATOS DE PRUEBA: Para asegurar que haya estudiantes al iniciar
-  if (records.length === 0) {
-    records = [
-      { cedula: "8-954-1234", nombre: "Juan Pérez", facultad: "FISC", motivo: "Estrés académico por exámenes parciales" },
-      { cedula: "3-745-8965", nombre: "Maria Dixon", facultad: "FIE", motivo: "Orientación vocacional y cambio de carrera" },
-      { cedula: "9-762-4321", nombre: "Carlos Rodríguez", facultad: "FIC", motivo: "Ansiedad generalizada y manejo del tiempo" }
-    ];
-    localStorage.setItem('utp_psic_registros', JSON.stringify(records));
-  }
-
-  // Renderizado inicial
+  protegerAccesoPsicologo();
   renderRecordsTable();
 
-  // Navegación del Menú Lateral
-  tabNewBtn.addEventListener('click', () => {
-    resetMenuContextStyles();
-    switchActivePanel('panel-new-register', tabNewBtn);
-  });
-
-  tabViewBtn.addEventListener('click', () => {
-    resetMenuContextStyles();
-    switchActivePanel('panel-view-registers', tabViewBtn);
-    renderRecordsTable(); 
-  });
-
-  function switchActivePanel(panelId, activeBtn) {
-    [tabNewBtn, tabViewBtn].forEach(b => b.classList.remove('active'));
-    panels.forEach(p => p.classList.remove('active'));
-
-    if (activeBtn) activeBtn.classList.add('active');
-    
-    const targetPanel = document.getElementById(panelId);
-    if (targetPanel) targetPanel.classList.add('active');
+  function protegerAccesoPsicologo() {
+    const usuarioActivo = leerJson(USUARIO_ACTIVO_KEY, null);
+    if (!usuarioActivo || usuarioActivo.rol !== 'psicologo') {
+      window.location.href = 'login.html';
+    }
   }
 
-  function resetMenuContextStyles() {
-    mainTitle.textContent = "Registros";
-    panelTag.style.background = "#e0f2fe";
-    panelTag.style.color = "#0369a1";
-    panelTag.innerHTML = `<svg viewBox="0 0 24 24" class="lock-icon" style="stroke: #0369a1;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg> Expedientes Clínicos`;
+  function obtenerRegistrosEstudiantes() {
+    const registrosGuardados = leerJson(REGISTROS_KEY, []);
+    const usuariosRegistrados = leerJson(USUARIOS_KEY, []);
+    const citasGuardadas = leerJson(CITAS_KEY, []);
+
+    const estudiantesDesdeUsuarios = usuariosRegistrados
+      .filter((usuario) => usuario && usuario.rol === 'estudiante' && usuario.cedula)
+      .map((usuario) => ({
+        cedula: usuario.cedula,
+        nombre: usuario.nombre || 'Estudiante registrado'
+      }));
+
+    const estudiantesDesdeCitas = citasGuardadas
+      .filter((cita) => cita && cita.estudianteCedula)
+      .map((cita) => ({
+        cedula: cita.estudianteCedula,
+        nombre: cita.estudianteNombre || 'Estudiante registrado'
+      }));
+
+    const registrosLimpios = registrosGuardados
+      .filter((registro) => registro && registro.cedula)
+      .filter((registro) => !REGISTROS_PREDETERMINADOS.has(String(registro.cedula).trim()))
+      .map((registro) => ({
+        cedula: registro.cedula,
+        nombre: registro.nombre || 'Estudiante registrado'
+      }));
+
+    const registros = unirPorCedula([...registrosLimpios, ...estudiantesDesdeUsuarios, ...estudiantesDesdeCitas]);
+
+    guardarJson(REGISTROS_KEY, registros);
+    return registros;
   }
 
-  // Guardar Nuevo Registro
-  document.getElementById('form-registro').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const item = {
-      cedula: document.getElementById('reg-cedula').value.trim(),
-      nombre: document.getElementById('reg-nombre').value.trim(),
-      facultad: document.getElementById('reg-facultad').value,
-      motivo: document.getElementById('reg-motivo').value.trim()
-    };
-    records.unshift(item);
-    localStorage.setItem('utp_psic_registros', JSON.stringify(records));
-    e.target.reset();
-    
-    switchActivePanel('panel-view-registers', tabViewBtn);
-    renderRecordsTable();
-  });
+  function unirPorCedula(lista) {
+    const mapa = new Map();
 
-  // Pintar Tabla en el HTML
+    lista.forEach((item) => {
+      if (!item || !item.cedula) return;
+      const clave = normalizar(item.cedula);
+
+      if (!mapa.has(clave)) {
+        mapa.set(clave, {
+          cedula: item.cedula,
+          nombre: item.nombre || 'Estudiante registrado'
+        });
+      }
+    });
+
+    return Array.from(mapa.values());
+  }
+
   function renderRecordsTable() {
+    records = obtenerRegistrosEstudiantes();
+    selectedStudentCedula = null;
+    selectedStudentName = null;
+
+    mostrarPanel('panel-view-registers');
+    mainTitle.textContent = 'Anotaciones privadas';
+    actualizarEtiquetaConfidencial();
+
+    if (contextMenu) contextMenu.style.display = 'none';
+
     if (records.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:#9ca3af; font-style:italic;">No hay estudiantes registrados.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:24px; color:#9ca3af; font-style:italic;">No hay estudiantes registrados.</td></tr>`;
       return;
     }
-    tableBody.innerHTML = records.map(r => `
-      <tr data-cedula="${r.cedula}" data-nombre="${r.nombre}">
-        <td style="font-weight:600; color:#111827;">${escapeHTML(r.cedula)}</td>
-        <td>${escapeHTML(r.nombre)}</td>
-        <td><span style="background:#f3f4f6; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold; color:#374151;">${r.facultad}</span></td>
-        <td>${escapeHTML(r.motivo)}</td>
+
+    tableBody.innerHTML = records.map((registro) => `
+      <tr data-cedula="${atributoHTML(registro.cedula)}" data-nombre="${atributoHTML(registro.nombre)}">
+        <td style="font-weight:600; color:#111827;">${escapeHTML(registro.cedula)}</td>
+        <td>${escapeHTML(registro.nombre)}</td>
       </tr>
     `).join('');
-    
-    // Vincula el click normal
+
     attachRowClickListeners();
   }
 
-  // CAMBIO CLAVE: DETECTAR CLIC IZQUIERDO NORMAL
   function attachRowClickListeners() {
-    const rows = tableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-      row.addEventListener('click', (e) => {
-        if (!row.getAttribute('data-cedula')) return;
-        
-        // Evitamos que el clic cierre el menú inmediatamente
-        e.stopPropagation(); 
-        
-        // Quitar selección visual vieja y añadirla a la fila tocada
-        rows.forEach(r => r.classList.remove('context-selected'));
+    const rows = tableBody.querySelectorAll('tr[data-cedula]');
+
+    rows.forEach((row) => {
+      row.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        rows.forEach((item) => item.classList.remove('context-selected'));
         row.classList.add('context-selected');
-        
+
         selectedStudentCedula = row.getAttribute('data-cedula');
         selectedStudentName = row.getAttribute('data-nombre');
 
-        // Posicionar el menú donde se hizo el clic izquierdo
-        contextMenu.style.top = `${e.pageY}px`;
-        contextMenu.style.left = `${e.pageX}px`;
-        contextMenu.style.display = 'block';
+        abrirMenuContextual(event);
       });
     });
   }
 
-  // Cerrar el menú si haces clic en cualquier otro lado de la pantalla
-  document.addEventListener('click', (e) => {
-    if (contextMenu && !contextMenu.contains(e.target)) {
+  function abrirMenuContextual(event) {
+    const anchoMenu = 220;
+    const margen = 16;
+    const left = Math.min(event.pageX, window.scrollX + window.innerWidth - anchoMenu - margen);
+
+    contextMenu.style.top = `${event.pageY}px`;
+    contextMenu.style.left = `${left}px`;
+    contextMenu.style.display = 'block';
+  }
+
+  document.addEventListener('click', (event) => {
+    if (contextMenu && !contextMenu.contains(event.target)) {
       contextMenu.style.display = 'none';
     }
   });
 
-  // MENÚ: CREAR ANOTACIÓN
-  document.getElementById('ctx-create-note').addEventListener('click', () => {
+  btnCreateNote.addEventListener('click', () => {
+    if (!validarEstudianteSeleccionado()) return;
+
     contextMenu.style.display = 'none';
     document.getElementById('create-note-title').textContent = `Nueva Anotación Privada para: ${selectedStudentName}`;
-    
-    mainTitle.textContent = "Anotaciones";
-    panelTag.style.background = "#fef2f2";
-    panelTag.style.color = "#ef4444";
-    panelTag.innerHTML = `⚠️ Expediente Confidencial`;
-
-    switchActivePanel('panel-create-context-note', null);
+    textareaNote.value = '';
+    mainTitle.textContent = 'Crear anotación privada';
+    actualizarEtiquetaConfidencial();
+    mostrarPanel('panel-create-context-note');
+    textareaNote.focus();
   });
 
-  // GUARDAR ANOTACIÓN
-  document.getElementById('btn-save-context-note').addEventListener('click', () => {
-    const textarea = document.getElementById('textarea-context-note');
-    const text = textarea.value.trim();
-    if(!text) return;
+  btnViewNotes.addEventListener('click', () => {
+    if (!validarEstudianteSeleccionado()) return;
+
+    contextMenu.style.display = 'none';
+    openViewNotesPanel();
+  });
+
+  btnSaveNote.addEventListener('click', () => {
+    if (!validarEstudianteSeleccionado()) return;
+
+    const text = textareaNote.value.trim();
+    if (!text) {
+      textareaNote.focus();
+      return;
+    }
 
     const newNote = {
       cedulaEstudiante: selectedStudentCedula,
+      nombreEstudiante: selectedStudentName,
       texto: text,
-      fecha: new Date().toLocaleDateString()
+      fecha: new Date().toLocaleDateString('es-PA'),
+      hora: new Date().toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })
     };
 
     notes.unshift(newNote);
-    localStorage.setItem('utp_psic_notas_vinculadas', JSON.stringify(notes));
-    textarea.value = '';
-    
+    guardarJson(NOTAS_KEY, notes);
+    textareaNote.value = '';
+
     openViewNotesPanel();
   });
 
-  // MENÚ: VER ANOTACIONES
-  document.getElementById('ctx-view-notes').addEventListener('click', () => {
-    contextMenu.style.display = 'none';
-    openViewNotesPanel();
-  });
+  if (btnBackFromCreate) {
+    btnBackFromCreate.addEventListener('click', () => {
+      textareaNote.value = '';
+      renderRecordsTable();
+    });
+  }
+
+  if (btnBackFromView) {
+    btnBackFromView.addEventListener('click', () => {
+      renderRecordsTable();
+    });
+  }
 
   function openViewNotesPanel() {
     document.getElementById('view-notes-title').textContent = `Historial Confidencial de: ${selectedStudentName}`;
-    
-    mainTitle.textContent = "Anotaciones";
-    panelTag.style.background = "#fef2f2";
-    panelTag.style.color = "#ef4444";
-
-    switchActivePanel('panel-view-context-notes', null);
+    mainTitle.textContent = 'Ver anotaciones privadas';
+    actualizarEtiquetaConfidencial();
+    mostrarPanel('panel-view-context-notes');
     renderContextNotesList();
   }
 
   function renderContextNotesList() {
     const container = document.getElementById('context-notes-list');
-    const filteredNotes = notes.filter(n => n.cedulaEstudiante === selectedStudentCedula);
+    const filteredNotes = notes.filter((nota) => nota.cedulaEstudiante === selectedStudentCedula);
 
     if (filteredNotes.length === 0) {
       container.innerHTML = `<p style="font-size:13px; color:#9ca3af; font-style:italic; text-align:center; padding:20px;">No existen anotaciones guardadas para este estudiante.</p>`;
       return;
     }
 
-    container.innerHTML = filteredNotes.map(n => `
+    container.innerHTML = filteredNotes.map((nota) => `
       <div class="note-item">
         <div>
-          <p>${escapeHTML(n.texto)}</p>
-          <span style="font-size:10px; color:#9ca3af; display:block; margin-top:4px;">Registrado el: ${n.fecha}</span>
+          <p>${escapeHTML(nota.texto)}</p>
+          <span style="font-size:10px; color:#9ca3af; display:block; margin-top:4px;">Registrado el: ${escapeHTML(nota.fecha)}${nota.hora ? ` - ${escapeHTML(nota.hora)}` : ''}</span>
         </div>
       </div>
     `).join('');
   }
 
-  function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
+  function mostrarPanel(panelId) {
+    panels.forEach((panel) => panel.classList.remove('active'));
+    const targetPanel = document.getElementById(panelId);
+    if (targetPanel) targetPanel.classList.add('active');
+  }
+
+  function validarEstudianteSeleccionado() {
+    return Boolean(selectedStudentCedula && selectedStudentName);
+  }
+
+  function actualizarEtiquetaConfidencial() {
+    panelTag.style.background = '#fef2f2';
+    panelTag.style.color = '#ef4444';
+    panelTag.innerHTML = `
+      <svg viewBox="0 0 24 24" class="lock-icon" style="stroke: #ef4444; fill: none;">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      Expediente confidencial
+    `;
+  }
+
+  function leerJson(clave, valorInicial) {
+    try {
+      return JSON.parse(localStorage.getItem(clave)) || valorInicial;
+    } catch (error) {
+      return valorInicial;
+    }
+  }
+
+  function guardarJson(clave, valor) {
+    localStorage.setItem(clave, JSON.stringify(valor));
+  }
+
+  function normalizar(valor) {
+    return String(valor || '').trim().toLowerCase();
+  }
+
+  function escapeHTML(valor) {
+    return String(valor || '').replace(/[&<>'"]/g, (caracter) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[caracter] || caracter));
+  }
+
+  function atributoHTML(valor) {
+    return escapeHTML(valor).replace(/`/g, '&#96;');
   }
 });

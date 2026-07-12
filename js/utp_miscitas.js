@@ -1,21 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-  /* ── DATA COMPARTIDA ── */
-  const citasDemo = [
-    { id:'C-001', doc:'Dr. Samir Horna', dia:24, mes:'Abr', mesNum:4, año:2026, hora:'11:00 AM', estado:'agendada', motivo:'Ansiedad académica.', nota:'' },
-    { id:'C-002', doc:'Dra. Aramys Cedeño', dia:15, mes:'Abr', mesNum:4, año:2026, hora:'09:00 AM', estado:'completada', motivo:'Seguimiento mensual.', nota:'Completada con éxito.' },
-  ];
+  /* ── CLAVES DE PERSISTENCIA ── */
+  const LS_CITAS_KEY = 'utp_citas';
+  const LS_USUARIO_ACTIVO_KEY = 'usuarioActivo';
+  const LS_CITA_REAGENDAR_KEY = 'utp_cita_reagendar_id';
 
   const DIAS_SEMANA = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const MESES_FULL = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
   let filterActivo = 'todas';
-  let selectedId = null;
   let deleteId = null;
-  let citas = cargarCitas();
+
+  const usuarioActivo = validarSesionEstudiante();
+  if (!usuarioActivo) return;
+
+  let todasLasCitas = cargarTodasLasCitas();
+  let citas = obtenerCitasDelUsuario();
 
   // Elementos Cacheables del DOM
   const listEl = document.getElementById('cita-list');
-  const ovDetailEl = document.getElementById('ov-detail');
   const ovDelEl = document.getElementById('ov-del');
   const toastEl = document.getElementById('toast');
 
@@ -23,19 +25,53 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   configurarEventosFijos();
 
-  /* ── PERSISTENCIA LOCAL STORAGE ── */
-  function cargarCitas() {
-    const guardadas = localStorage.getItem('utp_citas');
-    return guardadas ? JSON.parse(guardadas) : citasDemo;
+  /* ── UTILIDADES DE SESIÓN ── */
+  function leerJson(clave, valorInicial) {
+    try { return JSON.parse(localStorage.getItem(clave)) || valorInicial; }
+    catch { return valorInicial; }
   }
 
-  function guardarCitas() {
-    localStorage.setItem('utp_citas', JSON.stringify(citas));
+  function guardarJson(clave, valor) {
+    localStorage.setItem(clave, JSON.stringify(valor));
+  }
+
+  function normalizar(valor) {
+    return String(valor || '').trim().toLowerCase();
+  }
+
+  function validarSesionEstudiante() {
+    const usuario = leerJson(LS_USUARIO_ACTIVO_KEY, null);
+
+    if (!usuario || usuario.rol !== 'estudiante' || !usuario.cedula) {
+      window.location.href = 'login.html';
+      return null;
+    }
+
+    return usuario;
+  }
+
+  /* ── PERSISTENCIA LOCAL STORAGE ── */
+  function cargarTodasLasCitas() {
+    const guardadas = leerJson(LS_CITAS_KEY, []);
+    return Array.isArray(guardadas) ? guardadas : [];
+  }
+
+  function obtenerCitasDelUsuario() {
+    return todasLasCitas.filter(c => normalizar(c.estudianteCedula) === normalizar(usuarioActivo.cedula));
+  }
+
+  function guardarTodasLasCitas() {
+    guardarJson(LS_CITAS_KEY, todasLasCitas);
+    citas = obtenerCitasDelUsuario();
   }
 
   /* ── RENDERING DE LA LISTA DE CITAS ── */
   function render() {
-    const filtered = filterActivo === 'todas' ? citas : citas.filter(c => c.estado === filterActivo);
+    const filtered = filterActivo === 'todas'
+      ? citas
+      : filterActivo === 'atendida'
+        ? citas.filter(c => c.estado === 'atendida' || c.estado === 'completada')
+        : citas.filter(c => c.estado === filterActivo);
 
     if (!filtered.length) {
       listEl.innerHTML = `
@@ -54,17 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="mon">${c.mes}</span>
         </div>
         <div class="cita-info">
-          <div class="cita-doc">${c.doc}</div>
+          <div class="cita-doc">${escapeHTML(c.doc)}</div>
           <div class="cita-meta">
-            <span>🕐 ${c.hora}</span>
-            <span>📅 ${MESES_FULL[c.mesNum]} ${c.año}</span>
-            <span>📝 ${c.motivo.slice(0,38)}${c.motivo.length > 38 ? '…' : ''}</span>
+            <span> ${escapeHTML(c.hora)}</span>
+            <span> ${MESES_FULL[c.mesNum]} ${c.año}</span>
+            <span> ${escapeHTML(c.motivo || '').slice(0,38)}${(c.motivo || '').length > 38 ? '…' : ''}</span>
           </div>
         </div>
         <div class="cita-right">
           ${badgeHtml(c.estado)}
           <div class="cita-actions" data-stop-propagation="true">
-            <button class="btn-icon btn-action-view" title="Ver detalle" data-id="${c.id}">👁</button>
             ${c.estado === 'agendada' || c.estado === 'pendiente'
               ? `<button class="btn-icon btn-action-resched" title="Reagendar" data-id="${c.id}">📆</button>
                  <button class="btn-icon del btn-action-del" title="Cancelar cita" data-id="${c.id}">🗑</button>`
@@ -81,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const map = {
       agendada:  ['badge-active','✓ Agendada'],
       pendiente: ['badge-pending','⏳ Pendiente'],
+      atendida:  ['badge-done','✔ Atendida'],
       completada:['badge-done','✔ Completada'],
       cancelada: ['badge-cancel','✕ Cancelada'],
     };
@@ -88,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<span class="badge ${cls}">${lbl}</span>`;
   }
 
-  /* ── CONTROL DE ASIGNACIÓN DE FILTROS ── */
+  /* ── CONTROL DE FILTROS ── */
   document.querySelectorAll('#filters-container .filter-tab').forEach(tab => {
     tab.addEventListener('click', function() {
       document.querySelectorAll('#filters-container .filter-tab').forEach(t => t.classList.remove('on'));
@@ -97,50 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
       render();
     });
   });
-
   /* ── MANEJADORES DE DIÁLOGOS Y VENTANAS FLOTANTES ── */
-  function openDetail(id) {
-    const c = citas.find(x => x.id === id);
-    if (!c) return;
-    selectedId = id;
-
-    document.getElementById('det-id').textContent = `ID: ${c.id}`;
-    document.getElementById('det-doc').textContent = c.doc;
-    document.getElementById('det-fecha').textContent = `${diaNombre(c.dia, c.mesNum, c.año)}, ${c.dia} de ${MESES_FULL[c.mesNum]} de ${c.año}`;
-    document.getElementById('det-hora').textContent = c.hora;
-    document.getElementById('det-psic').textContent = c.doc;
-    document.getElementById('det-estado').innerHTML = badgeHtml(c.estado);
-    document.getElementById('det-motivo').textContent = c.motivo;
-
-    const noteRow = document.getElementById('det-note-row');
-    if (c.nota) {
-      noteRow.style.display = 'flex';
-      document.getElementById('det-note').textContent = c.nota;
-    } else {
-      noteRow.style.display = 'none';
-    }
-
-    const actEl = document.getElementById('det-actions');
-    if (c.estado === 'agendada' || c.estado === 'pendiente') {
-      actEl.innerHTML = `
-        <button class="btn-full btn-primary-full" id="modal-act-resched">📆 Reagendar cita</button>
-        <button class="btn-full btn-danger-full" id="modal-act-del">🗑 Cancelar cita</button>
-        <button class="btn-full btn-outline-full id-close-det-btn">Cerrar</button>`;
-      
-      // Adjuntar eventos internos del modal
-      document.getElementById('modal-act-resched').addEventListener('click', () => { openReschedule(c.id); closeDetail(); });
-      document.getElementById('modal-act-del').addEventListener('click', () => { closeDetail(); openDelModal(c.id); });
-      document.querySelector('.id-close-det-btn').addEventListener('click', closeDetail);
-    } else {
-      actEl.innerHTML = `<button class="btn-full btn-outline-full id-close-det-btn">Cerrar</button>`;
-      document.querySelector('.id-close-det-btn').addEventListener('click', closeDetail);
-    }
-
-    ovDetailEl.classList.add('on');
-  }
-
-  function closeDetail() { ovDetailEl.classList.remove('on'); }
-
   function openDelModal(id) {
     deleteId = id;
     ovDelEl.classList.add('on');
@@ -149,12 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function confirmDelete() {
     if (!deleteId) return;
-    const c = citas.find(x => x.id === deleteId);
+
+    const c = todasLasCitas.find(x => (
+      x.id === deleteId && normalizar(x.estudianteCedula) === normalizar(usuarioActivo.cedula)
+    ));
+
     if (c) {
       c.estado = 'cancelada';
       c.nota = 'Cancelada por el estudiante.';
     }
-    guardarCitas();
+
+    guardarTodasLasCitas();
     closeDelModal();
     render();
     showToast('✓ Cita cancelada correctamente');
@@ -163,14 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function openReschedule(id) {
     const c = citas.find(x => x.id === id);
     if (!c) return;
-    showToast(`📆 Redirigiendo para reagendar cita con ${c.doc}…`);
+
+    // Se guarda el ID de la cita activa que se va a mover.
+    // En utp_agendar.js no se creará una cita duplicada: se actualizará esta misma cita.
+    localStorage.setItem(LS_CITA_REAGENDAR_KEY, String(id));
+
+    showToast(`Redirigiendo para reagendar cita con ${c.doc}…`);
     setTimeout(() => {
       window.location.href = 'utp_agendar.html';
-    }, 1500);
-  }
-
-  function diaNombre(d, m, y) {
-    return DIAS_SEMANA[new Date(y, m - 1, d).getDay()];
+    }, 800);
   }
 
   function showToast(msg) {
@@ -179,36 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => toastEl.classList.remove('show'), 3000);
   }
 
-  /* ── LISTENERS ASINCRÓNICOS Y DINÁMICOS ── */
+  /* ── LISTENERS FIJOS Y DINÁMICOS ── */
   function configurarEventosFijos() {
     document.getElementById('btn-back-dashboard').addEventListener('click', () => {
       window.location.href = 'dashboard.html';
     });
-    document.getElementById('btn-close-detail').addEventListener('click', closeDetail);
     document.getElementById('btn-cancel-del').addEventListener('click', closeDelModal);
     document.getElementById('btn-confirm-del').addEventListener('click', confirmDelete);
 
-    // Cerrar interactuando con las capas externas opacas (out-click)
-    ovDetailEl.addEventListener('click', e => { if (e.target === e.currentTarget) closeDetail(); });
     ovDelEl.addEventListener('click', e => { if (e.target === e.currentTarget) closeDelModal(); });
   }
 
   function configurarEventosDinamicos() {
-    // Al pulsar la tarjeta completa
-    document.querySelectorAll('.cita-card').forEach(card => {
-      card.addEventListener('click', function() {
-        openDetail(this.getAttribute('data-id'));
-      });
-    });
 
-    // Detener propagaciones de burbuja en contenedores de acciones
     document.querySelectorAll('[data-stop-propagation="true"]').forEach(elem => {
       elem.addEventListener('click', e => e.stopPropagation());
-    });
-
-    // Botones internos de la lista
-    document.querySelectorAll('.btn-action-view').forEach(btn => {
-      btn.addEventListener('click', function() { openDetail(this.getAttribute('data-id')); });
     });
     document.querySelectorAll('.btn-action-resched').forEach(btn => {
       btn.addEventListener('click', function() { openReschedule(this.getAttribute('data-id')); });
@@ -216,5 +200,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-action-del').forEach(btn => {
       btn.addEventListener('click', function() { openDelModal(this.getAttribute('data-id')); });
     });
+  }
+
+  function escapeHTML(str) {
+    return String(str || '').replace(/[&<>'"]/g, t => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[t] || t));
   }
 });
