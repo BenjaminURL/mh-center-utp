@@ -1,9 +1,6 @@
 # Sistema de Orientación Psicológica UTP
 
 Credenciales de demostración:
-
-- Estudiante: `8-111-111` / `1234`
-- Psicólogo: `8-222-222` / `1234`
 - Directora: `8-333-333` / `1234`
 
 Funciones agregadas:
