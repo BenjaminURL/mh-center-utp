@@ -12,22 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const usuariosBase = [
     {
-      cedula: '8-111-111',
-      password: '1234',
-      nombre: 'Estudiante de prueba',
-      correo: 'estudiante@utp.ac.pa',
-      rol: 'estudiante',
-      redirect: 'dashboard.html'
-    },
-    {
-      cedula: '8-222-222',
-      password: '1234',
-      nombre: 'Psicólogo de prueba',
-      correo: 'psicologo@utp.ac.pa',
-      rol: 'psicologo',
-      redirect: 'psicologo.html'
-    },
-    {
       cedula: '8-333-333',
       password: '1234',
       nombre: 'Directora de Orientación Psicológica',

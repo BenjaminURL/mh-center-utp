@@ -563,3 +563,52 @@ svg {
     gap: 16px;
   }
 }
+/* Iconos PNG usados en los paneles de psicólogo y directora */
+.icon-circle img,
+.profile-circle img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
+
+.menu-icon img {
+  width: 23px;
+  height: 23px;
+  object-fit: contain;
+  display: block;
+}
+
+.chevron img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
+
+.logout img {
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+  display: block;
+}
+
+
+/* Logo institucional usado en todos los encabezados. */
+.logo {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.utp-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}

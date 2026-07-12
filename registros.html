@@ -10,7 +10,13 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">UTP</div>
+      <div class="logo">
+        <img
+          class="utp-logo"
+          src="./images/icons/utp.png"
+          alt="Logo de la Universidad Tecnológica de Panamá"
+        >
+      </div>
       <div>
         <div class="brand-title">Universidad Tecnológica de Panamá</div>
         <div class="brand-subtitle">Dirección de Orientación Psicológica</div>
@@ -51,7 +57,33 @@
 
         <div class="annotations-content">
           <div id="panel-view-registers" class="sub-panel active">
-            <h2 class="sub-panel-title">Base de Datos de Atenciones</h2>
+            <div class="records-heading-row">
+              <div>
+                <h2 class="sub-panel-title">Base de Datos de Atenciones</h2>
+                <p class="records-helper-text">Solo se muestran estudiantes que tienen citas asignadas al profesional activo.</p>
+              </div>
+              <span id="records-count" class="records-count" aria-live="polite">0 estudiantes</span>
+            </div>
+
+            <div class="student-filter" role="search">
+              <label for="student-search">Buscar estudiante</label>
+              <div class="student-filter-control">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input
+                  id="student-search"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Escriba la cédula, nombre o apellido"
+                  aria-describedby="student-filter-help"
+                />
+                <button type="button" id="btn-clear-student-search" class="student-filter-clear" hidden>Limpiar</button>
+              </div>
+              <p id="student-filter-help" class="student-filter-help">Puede buscar por cédula completa o parcial, nombre, apellido o nombre completo.</p>
+            </div>
+
             <div class="table-responsive">
               <table class="records-table">
                 <thead>

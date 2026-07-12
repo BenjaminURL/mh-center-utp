@@ -10,72 +10,98 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBackFromCreate = document.getElementById('btn-back-from-create');
   const btnBackFromView = document.getElementById('btn-back-from-view');
   const textareaNote = document.getElementById('textarea-context-note');
+  const studentSearch = document.getElementById('student-search');
+  const btnClearStudentSearch = document.getElementById('btn-clear-student-search');
+  const recordsCount = document.getElementById('records-count');
 
-  const REGISTROS_KEY = 'utp_psic_registros';
   const NOTAS_KEY = 'utp_psic_notas_vinculadas';
-  const USUARIOS_KEY = 'usuariosRegistrados';
   const USUARIO_ACTIVO_KEY = 'usuarioActivo';
   const CITAS_KEY = 'utp_citas';
 
-  const REGISTROS_PREDETERMINADOS = new Set([
-    '8-954-1234',
-    '3-745-8965',
-    '9-762-4321'
-  ]);
-
   let selectedStudentCedula = null;
   let selectedStudentName = null;
-
   let records = [];
+  let filteredRecords = [];
   let notes = leerJson(NOTAS_KEY, []);
 
-  protegerAccesoPsicologo();
+  const usuarioActivo = protegerAccesoPsicologo();
+  if (!usuarioActivo) return;
+
   renderRecordsTable();
 
+  if (studentSearch) {
+    studentSearch.addEventListener('input', () => {
+      aplicarFiltroEstudiantes();
+    });
+
+    studentSearch.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && studentSearch.value) {
+        limpiarFiltroEstudiantes();
+      }
+    });
+  }
+
+  if (btnClearStudentSearch) {
+    btnClearStudentSearch.addEventListener('click', limpiarFiltroEstudiantes);
+  }
+
   function protegerAccesoPsicologo() {
-    const usuarioActivo = leerJson(USUARIO_ACTIVO_KEY, null);
-    if (!usuarioActivo || !['psicologo', 'directora'].includes(usuarioActivo.rol)) {
+    const usuario = leerJson(USUARIO_ACTIVO_KEY, null);
+
+    if (!usuario || !['psicologo', 'directora'].includes(usuario.rol) || !usuario.cedula) {
       window.location.href = 'login.html';
-      return;
+      return null;
     }
 
     const backMenu = document.querySelector('.btn-back-menu');
     if (backMenu) {
-      backMenu.href = usuarioActivo.rol === 'directora' ? 'directora.html' : 'psicologo.html';
+      backMenu.href = usuario.rol === 'directora' ? 'directora.html' : 'psicologo.html';
     }
+
+    return usuario;
   }
 
+  /**
+   * Devuelve únicamente los estudiantes con al menos una cita asignada al
+   * psicólogo o directora que mantiene la sesión activa.
+   */
   function obtenerRegistrosEstudiantes() {
-    const registrosGuardados = leerJson(REGISTROS_KEY, []);
-    const usuariosRegistrados = leerJson(USUARIOS_KEY, []);
     const citasGuardadas = leerJson(CITAS_KEY, []);
 
-    const estudiantesDesdeUsuarios = usuariosRegistrados
-      .filter((usuario) => usuario && usuario.rol === 'estudiante' && usuario.cedula)
-      .map((usuario) => ({
-        cedula: usuario.cedula,
-        nombre: usuario.nombre || 'Estudiante registrado'
-      }));
+    if (!Array.isArray(citasGuardadas)) return [];
 
-    const estudiantesDesdeCitas = citasGuardadas
+    const estudiantesAsignados = citasGuardadas
       .filter((cita) => cita && cita.estudianteCedula)
+      .filter(esCitaDelProfesionalActivo)
       .map((cita) => ({
         cedula: cita.estudianteCedula,
         nombre: cita.estudianteNombre || 'Estudiante registrado'
       }));
 
-    const registrosLimpios = registrosGuardados
-      .filter((registro) => registro && registro.cedula)
-      .filter((registro) => !REGISTROS_PREDETERMINADOS.has(String(registro.cedula).trim()))
-      .map((registro) => ({
-        cedula: registro.cedula,
-        nombre: registro.nombre || 'Estudiante registrado'
-      }));
+    return unirPorCedula(estudiantesAsignados);
+  }
 
-    const registros = unirPorCedula([...registrosLimpios, ...estudiantesDesdeUsuarios, ...estudiantesDesdeCitas]);
+  function esCitaDelProfesionalActivo(cita) {
+    const cedulaCita = normalizarCedula(cita.psicologoCedula);
+    const cedulaProfesional = normalizarCedula(usuarioActivo.cedula);
 
-    guardarJson(REGISTROS_KEY, registros);
-    return registros;
+    if (cedulaCita && cedulaProfesional) {
+      return cedulaCita === cedulaProfesional;
+    }
+
+    // Compatibilidad limitada con citas antiguas que solo guardaban el nombre.
+    const nombreCita = normalizarTexto(cita.doc || cita.psicologoNombre);
+    const nombreProfesional = normalizarTexto(usuarioActivo.nombre);
+
+    return Boolean(
+      nombreCita &&
+      nombreProfesional &&
+      (nombreCita.includes(nombreProfesional) || nombreProfesional.includes(nombreCita))
+    );
+  }
+
+  function esNotaDelProfesionalActivo(nota) {
+    return normalizarCedula(nota.psicologoCedula) === normalizarCedula(usuarioActivo.cedula);
   }
 
   function unirPorCedula(lista) {
@@ -83,7 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     lista.forEach((item) => {
       if (!item || !item.cedula) return;
-      const clave = normalizar(item.cedula);
+
+      const clave = normalizarCedula(item.cedula);
+      if (!clave) return;
 
       if (!mapa.has(clave)) {
         mapa.set(clave, {
@@ -93,7 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    return Array.from(mapa.values());
+    return Array.from(mapa.values()).sort((a, b) =>
+      String(a.nombre).localeCompare(String(b.nombre), 'es', { sensitivity: 'base' })
+    );
   }
 
   function renderRecordsTable() {
@@ -107,12 +137,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (contextMenu) contextMenu.style.display = 'none';
 
+    aplicarFiltroEstudiantes();
+  }
+
+  function aplicarFiltroEstudiantes() {
+    const termino = normalizarBusqueda(studentSearch ? studentSearch.value : '');
+
+    filteredRecords = records.filter((registro) => {
+      if (!termino) return true;
+
+      const cedula = normalizarBusqueda(registro.cedula);
+      const nombreCompleto = normalizarBusqueda(registro.nombre);
+      const palabrasBuscadas = termino.split(/\s+/).filter(Boolean);
+
+      return (
+        cedula.includes(termino) ||
+        nombreCompleto.includes(termino) ||
+        palabrasBuscadas.every((palabra) => nombreCompleto.includes(palabra))
+      );
+    });
+
+    if (btnClearStudentSearch) {
+      btnClearStudentSearch.hidden = !termino;
+    }
+
+    actualizarContadorRegistros(filteredRecords.length, records.length);
+    renderFilasEstudiantes(termino);
+  }
+
+  function renderFilasEstudiantes(termino) {
     if (records.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:24px; color:#9ca3af; font-style:italic;">No hay estudiantes registrados.</td></tr>`;
+      tableBody.innerHTML = `
+        <tr class="records-empty-state">
+          <td colspan="2">
+            No hay estudiantes con citas asignadas a este profesional.
+          </td>
+        </tr>`;
       return;
     }
 
-    tableBody.innerHTML = records.map((registro) => `
+    if (filteredRecords.length === 0) {
+      tableBody.innerHTML = `
+        <tr class="records-empty-state">
+          <td colspan="2">
+            No se encontraron estudiantes que coincidan con "${escapeHTML(termino)}".
+          </td>
+        </tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = filteredRecords.map((registro) => `
       <tr data-cedula="${atributoHTML(registro.cedula)}" data-nombre="${atributoHTML(registro.nombre)}">
         <td style="font-weight:600; color:#111827;">${escapeHTML(registro.cedula)}</td>
         <td>${escapeHTML(registro.nombre)}</td>
@@ -120,6 +194,32 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
 
     attachRowClickListeners();
+  }
+
+  function actualizarContadorRegistros(cantidadVisible, cantidadTotal) {
+    if (!recordsCount) return;
+
+    if (cantidadTotal === 0) {
+      recordsCount.textContent = '0 estudiantes';
+      return;
+    }
+
+    const terminoActivo = Boolean(normalizarBusqueda(studentSearch ? studentSearch.value : ''));
+
+    if (terminoActivo) {
+      recordsCount.textContent = `${cantidadVisible} de ${cantidadTotal}`;
+      return;
+    }
+
+    recordsCount.textContent = `${cantidadTotal} ${cantidadTotal === 1 ? 'estudiante' : 'estudiantes'}`;
+  }
+
+  function limpiarFiltroEstudiantes() {
+    if (!studentSearch) return;
+
+    studentSearch.value = '';
+    aplicarFiltroEstudiantes();
+    studentSearch.focus();
   }
 
   function attachRowClickListeners() {
@@ -178,6 +278,17 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSaveNote.addEventListener('click', () => {
     if (!validarEstudianteSeleccionado()) return;
 
+    // Impide guardar una nota si la relación estudiante-profesional ya no
+    // existe en las citas almacenadas.
+    const sigueAsignado = obtenerRegistrosEstudiantes().some(
+      (registro) => normalizarCedula(registro.cedula) === normalizarCedula(selectedStudentCedula)
+    );
+
+    if (!sigueAsignado) {
+      renderRecordsTable();
+      return;
+    }
+
     const text = textareaNote.value.trim();
     if (!text) {
       textareaNote.focus();
@@ -185,11 +296,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const newNote = {
+      id: `N-${Date.now()}`,
+      psicologoCedula: usuarioActivo.cedula,
+      psicologoNombre: usuarioActivo.nombre || 'Profesional',
       cedulaEstudiante: selectedStudentCedula,
       nombreEstudiante: selectedStudentName,
       texto: text,
       fecha: new Date().toLocaleDateString('es-PA'),
-      hora: new Date().toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' })
+      hora: new Date().toLocaleTimeString('es-PA', { hour: '2-digit', minute: '2-digit' }),
+      creadoEn: new Date().toISOString()
     };
 
     notes.unshift(newNote);
@@ -222,10 +337,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderContextNotesList() {
     const container = document.getElementById('context-notes-list');
-    const filteredNotes = notes.filter((nota) => nota.cedulaEstudiante === selectedStudentCedula);
+    const estudianteSeleccionado = normalizarCedula(selectedStudentCedula);
+
+    const filteredNotes = notes.filter((nota) =>
+      normalizarCedula(nota.cedulaEstudiante) === estudianteSeleccionado &&
+      esNotaDelProfesionalActivo(nota)
+    );
 
     if (filteredNotes.length === 0) {
-      container.innerHTML = `<p style="font-size:13px; color:#9ca3af; font-style:italic; text-align:center; padding:20px;">No existen anotaciones guardadas para este estudiante.</p>`;
+      container.innerHTML = `
+        <p style="font-size:13px; color:#9ca3af; font-style:italic; text-align:center; padding:20px;">
+          Este profesional no ha guardado anotaciones para el estudiante.
+        </p>`;
       return;
     }
 
@@ -233,7 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-item">
         <div>
           <p>${escapeHTML(nota.texto)}</p>
-          <span style="font-size:10px; color:#9ca3af; display:block; margin-top:4px;">Registrado el: ${escapeHTML(nota.fecha)}${nota.hora ? ` - ${escapeHTML(nota.hora)}` : ''}</span>
+          <span style="font-size:10px; color:#9ca3af; display:block; margin-top:4px;">
+            Registrado el: ${escapeHTML(nota.fecha)}${nota.hora ? ` - ${escapeHTML(nota.hora)}` : ''}
+          </span>
         </div>
       </div>
     `).join('');
@@ -263,7 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function leerJson(clave, valorInicial) {
     try {
-      return JSON.parse(localStorage.getItem(clave)) || valorInicial;
+      const valor = JSON.parse(localStorage.getItem(clave));
+      return valor ?? valorInicial;
     } catch (error) {
       return valorInicial;
     }
@@ -273,8 +399,26 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(clave, JSON.stringify(valor));
   }
 
-  function normalizar(valor) {
-    return String(valor || '').trim().toLowerCase();
+  function normalizarCedula(valor) {
+    return String(valor || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  function normalizarTexto(valor) {
+    return String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
+  }
+
+  function normalizarBusqueda(valor) {
+    return normalizarTexto(valor)
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   function escapeHTML(valor) {
