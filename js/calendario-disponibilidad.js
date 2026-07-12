@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function validarSesionPsicologo() {
     const usuario = leerJson(LS_USUARIO_ACTIVO_KEY, null);
 
-    if (!usuario || usuario.rol !== "psicologo" || !usuario.cedula) {
+    if (!usuario || !["psicologo", "directora"].includes(usuario.rol) || !usuario.cedula) {
       window.location.href = "login.html";
       return null;
     }
@@ -245,9 +245,14 @@ document.addEventListener("DOMContentLoaded", () => {
     updateWeekView();
   });
 
+  const cancelButton = document.querySelector('a.btn-secondary[href="psicologo.html"]');
+  if (cancelButton) {
+    cancelButton.href = usuarioActivo.rol === "directora" ? "directora.html" : "psicologo.html";
+  }
+
   saveButton.addEventListener("click", () => {
     saveWeekSelections();
-    window.location.href = "psicologo.html";
+    window.location.href = usuarioActivo.rol === "directora" ? "directora.html" : "psicologo.html";
   });
 
   closeModal.addEventListener("click", () => successModal.classList.remove("show"));

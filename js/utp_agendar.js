@@ -6,15 +6,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const LS_DISP_KEY = 'utp_disponibilidad_psicologos';
-  const LS_OLD_DISP_KEY = 'utp_disponibilidad';
   const LS_CITAS_KEY = 'utp_citas';
   const LS_USUARIO_ACTIVO_KEY = 'usuarioActivo';
   const LS_USUARIOS_REGISTRADOS_KEY = 'usuariosRegistrados';
   const LS_CITA_REAGENDAR_KEY = 'utp_cita_reagendar_id';
-
-  const PSICOLOGOS_BASE = [
-    { cedula: '345', nombre: 'Cui Hernandez', correo: '' }
-  ];
 
   const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
@@ -36,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const slotsGridEl = document.getElementById('slots-grid');
   const btnContinuarEl = document.getElementById('btn-continuar');
   const confirmOverlayEl = document.getElementById('confirm-overlay');
+  const btnPrevPsicEl = document.getElementById('btn-prev-psic');
+  const btnNextPsicEl = document.getElementById('btn-next-psic');
 
   const usuarioActivo = validarSesionEstudiante();
   if (!usuarioActivo) return;
@@ -68,16 +65,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function obtenerPsicologos() {
+    // La directora también atiende como psicóloga. Se incluye siempre como
+    // profesional predeterminada, aunque no haya sido creada desde el módulo
+    // "Nuevo colaborador". Su disponibilidad se guarda con su propia cédula.
+    const directoraDefault = {
+      cedula: '8-333-333',
+      nombre: 'Directora de Orientación Psicológica',
+      correo: 'directora@utp.ac.pa',
+      rol: 'directora'
+    };
+
     const registrados = leerJson(LS_USUARIOS_REGISTRADOS_KEY, [])
       .filter(usuario => usuario && usuario.rol === 'psicologo')
       .map(usuario => ({
         cedula: usuario.cedula,
         nombre: usuario.nombre || 'Psicólogo registrado',
-        correo: usuario.correo || ''
+        correo: usuario.correo || '',
+        rol: 'psicologo'
       }));
 
     const mapa = new Map();
-    [...PSICOLOGOS_BASE, ...registrados].forEach(psicologo => {
+
+    [directoraDefault, ...registrados].forEach(psicologo => {
       if (!psicologo.cedula) return;
       mapa.set(normalizar(psicologo.cedula), psicologo);
     });
@@ -102,6 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return `Psic. ${nombrePsicologo(psicologo)}`;
   }
 
+  function actualizarNavegacionPsicologos() {
+    const debeDeshabilitar = psicologos.length <= 1;
+
+    btnPrevPsicEl.disabled = debeDeshabilitar;
+    btnNextPsicEl.disabled = debeDeshabilitar;
+    btnPrevPsicEl.setAttribute('aria-disabled', String(debeDeshabilitar));
+    btnNextPsicEl.setAttribute('aria-disabled', String(debeDeshabilitar));
+  }
+
   function leerDisponibilidades() {
     const data = leerJson(LS_DISP_KEY, {});
     return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
@@ -113,11 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data[key] && data[key].disponibilidad) {
       return data[key].disponibilidad;
-    }
-
-    // Compatibilidad con el calendario global anterior para el psicólogo base.
-    if (key === '345') {
-      return leerJson(LS_OLD_DISP_KEY, {});
     }
 
     return {};
@@ -181,15 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderCal() {
     const psicologo = psicologoActual();
-    psicNameEl.textContent = nombrePsicologo(psicologo);
     monthLabelEl.textContent = `${MONTHS_EN[month]} ${year}`;
+    actualizarNavegacionPsicologos();
 
     if (!psicologos.length) {
-      calBodyEl.innerHTML = `<div class="cal-cell empty" style="grid-column:1/-1; padding:20px;">No hay psicólogos registrados.</div>`;
+      psicNameEl.textContent = 'Sin psicólogos registrados';
+      calBodyEl.innerHTML = `<div class="cal-cell empty" style="grid-column:1/-1; padding:24px; line-height:1.5;">Todavía no hay psicólogos registrados por la directora.</div>`;
       slotsSectionEl.style.display = 'none';
       btnContinuarEl.classList.remove('show');
       return;
     }
+
+    psicNameEl.textContent = nombrePsicologo(psicologo);
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -300,7 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.getElementById('btn-prev-psic').addEventListener('click', () => {
+  btnPrevPsicEl.addEventListener('click', () => {
+    if (psicologos.length <= 1) return;
+
     psicIdx = (psicIdx - 1 + psicologos.length) % psicologos.length;
     selectedDay = null;
     selectedSlot = null;
@@ -309,7 +327,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCal();
   });
 
-  document.getElementById('btn-next-psic').addEventListener('click', () => {
+  btnNextPsicEl.addEventListener('click', () => {
+    if (psicologos.length <= 1) return;
+
     psicIdx = (psicIdx + 1) % psicologos.length;
     selectedDay = null;
     selectedSlot = null;
@@ -325,6 +345,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!selectedDay || !selectedSlot) return;
 
     const psicologo = psicologoActual();
+    if (!psicologo.cedula) return;
+
     const dayNames2 = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const date = new Date(year, month, selectedDay);
 

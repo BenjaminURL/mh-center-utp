@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reportes del equipo - Orientación Psicológica</title>
+  <link rel="stylesheet" href="./css/psicologo.css" />
+  <link rel="stylesheet" href="./css/directora.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">UTP</div>
+      <div>
+        <div class="brand-title">Universidad Tecnológica de Panamá</div>
+        <div class="brand-subtitle">Dirección de Orientación Psicológica</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="profile-circle" aria-label="Perfil">
+        <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="director-page reports-page">
+    <a class="director-back" href="directora.html">← Regresar al panel</a>
+
+    <section class="director-card">
+      <div class="director-heading reports-heading">
+        <div>
+          <span class="section-tag">Supervisión</span>
+          <h1>Reportes del equipo</h1>
+          <p>Consulta los reportes diarios enviados por todos los colaboradores.</p>
+        </div>
+        <span class="report-count" id="report-count">0 reportes</span>
+      </div>
+
+      <div class="report-filters">
+        <div class="field-group">
+          <label for="filter-name">Buscar colaborador</label>
+          <input id="filter-name" type="search" placeholder="Nombre, cédula o correo" />
+        </div>
+        <div class="field-group">
+          <label for="filter-date">Fecha</label>
+          <input id="filter-date" type="date" />
+        </div>
+        <button class="secondary-button filter-clear" type="button" id="clear-filters">Limpiar filtros</button>
+      </div>
+
+      <div class="empty-reports" id="empty-reports">
+        <div class="empty-reports-icon">▱</div>
+        <h2>No hay reportes registrados</h2>
+        <p>Los reportes enviados por los colaboradores aparecerán en esta sección.</p>
+      </div>
+
+      <div class="reports-list" id="reports-list"></div>
+    </section>
+  </main>
+
+  <script src="js/ver-reportes.js"></script>
+</body>
+</html>

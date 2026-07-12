@@ -360,3 +360,9 @@ body {
 /* Hora disponible: siempre negrita (también aplicado inline como refuerzo) */
 .slot .slot-time { font-weight: 700; }
 
+
+.psic-nav button:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+.psic-nav button:disabled:hover { background: none; }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuevo colaborador - Orientación Psicológica</title>
+  <link rel="stylesheet" href="./css/psicologo.css" />
+  <link rel="stylesheet" href="./css/directora.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">UTP</div>
+      <div>
+        <div class="brand-title">Universidad Tecnológica de Panamá</div>
+        <div class="brand-subtitle">Dirección de Orientación Psicológica</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="profile-circle" aria-label="Perfil">
+        <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="director-page">
+    <a class="director-back" href="directora.html">← Regresar al panel</a>
+
+    <section class="director-card form-card">
+      <div class="director-heading">
+        <div>
+          <span class="section-tag">Administración</span>
+          <h1>Nuevo colaborador</h1>
+          <p>Registra los datos y las credenciales de acceso de un nuevo psicólogo.</p>
+        </div>
+      </div>
+
+      <form id="form-colaborador" class="collaborator-form" novalidate>
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" placeholder="Ejemplo: Andrea" required />
+          </div>
+
+          <div class="field-group">
+            <label for="apellido">Apellido</label>
+            <input id="apellido" name="apellido" type="text" placeholder="Ejemplo: González" required />
+          </div>
+
+          <div class="field-group">
+            <label for="cedula">Cédula</label>
+            <input id="cedula" name="cedula" type="text" placeholder="Ejemplo: 8-444-444" required />
+          </div>
+
+          <div class="field-group">
+            <label for="correo">Correo</label>
+            <input id="correo" name="correo" type="email" placeholder="nombre@utp.ac.pa" required />
+          </div>
+
+          <div class="field-group full-width">
+            <label for="password">Contraseña</label>
+            <input id="password" name="password" type="password" placeholder="Mínimo 4 caracteres" minlength="4" required />
+          </div>
+        </div>
+
+        <p class="form-message error-message" id="form-error" aria-live="polite"></p>
+        <p class="form-message success-message" id="form-success" aria-live="polite"></p>
+
+        <div class="form-buttons">
+          <a class="secondary-button" href="directora.html">Cancelar</a>
+          <button class="primary-button" type="submit">Registrar colaborador</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/nuevo-colaborador.js"></script>
+</body>
+</html>

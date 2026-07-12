@@ -276,6 +276,89 @@ input {
     text-align: center;
 }
 
+
+
+.login-success {
+    min-height: 19px;
+    color: #15803d;
+    font-size: 0.83rem;
+    font-weight: 650;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.register-access {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.btn-register {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--primary);
+    background-color: #ffffff;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.btn-register:hover {
+    background-color: var(--accent-soft);
+}
+
+.registration-card {
+    max-width: 520px;
+}
+
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.registration-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.registration-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 3px;
+}
+
+.btn-back-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text);
+    text-decoration: none;
+}
+
+.btn-back-login:hover {
+    background: var(--accent-soft);
+}
+
+.registration-note {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    text-align: center;
+}
+
 @media (max-width: 992px) {
     .login-container {
         justify-content: center;
@@ -324,5 +407,10 @@ input {
 
     .welcome-title {
         font-size: 1.85rem;
+    }
+
+    .registration-row,
+    .registration-actions {
+        grid-template-columns: 1fr;
     }
 }

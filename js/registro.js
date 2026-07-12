@@ -34,8 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function protegerAccesoPsicologo() {
     const usuarioActivo = leerJson(USUARIO_ACTIVO_KEY, null);
-    if (!usuarioActivo || usuarioActivo.rol !== 'psicologo') {
+    if (!usuarioActivo || !['psicologo', 'directora'].includes(usuarioActivo.rol)) {
       window.location.href = 'login.html';
+      return;
+    }
+
+    const backMenu = document.querySelector('.btn-back-menu');
+    if (backMenu) {
+      backMenu.href = usuarioActivo.rol === 'directora' ? 'directora.html' : 'psicologo.html';
     }
   }
 

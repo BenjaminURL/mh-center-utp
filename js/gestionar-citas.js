@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toastEl = document.getElementById('toast');
 
   document.getElementById('btn-back-panel').addEventListener('click', () => {
-    window.location.href = 'psicologo.html';
+    window.location.href = usuarioActivo.rol === 'directora' ? 'directora.html' : 'psicologo.html';
   });
 
   document.querySelectorAll('#filters-container .filter-tab').forEach(tab => {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function validarSesionPsicologo() {
     const usuario = leerJson(LS_USUARIO_ACTIVO_KEY, null);
 
-    if (!usuario || usuario.rol !== 'psicologo' || !usuario.cedula) {
+    if (!usuario || !['psicologo', 'directora'].includes(usuario.rol) || !usuario.cedula) {
       window.location.href = 'login.html';
       return null;
     }
