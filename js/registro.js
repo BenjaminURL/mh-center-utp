@@ -100,10 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-  function esNotaDelProfesionalActivo(nota) {
-    return normalizarCedula(nota.psicologoCedula) === normalizarCedula(usuarioActivo.cedula);
-  }
-
   function unirPorCedula(lista) {
     const mapa = new Map();
 
@@ -339,29 +335,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('context-notes-list');
     const estudianteSeleccionado = normalizarCedula(selectedStudentCedula);
 
-    const filteredNotes = notes.filter((nota) =>
-      normalizarCedula(nota.cedulaEstudiante) === estudianteSeleccionado &&
-      esNotaDelProfesionalActivo(nota)
-    );
+    // Se muestran todas las anotaciones vinculadas con el estudiante,
+    // independientemente del psicólogo o directora que las haya creado.
+    // El estudiante continúa siendo visible únicamente para profesionales
+    // que tengan al menos una cita asignada con él.
+    const filteredNotes = notes
+      .filter((nota) =>
+        normalizarCedula(nota.cedulaEstudiante) === estudianteSeleccionado
+      )
+      .sort((a, b) => obtenerMarcaTiempo(b) - obtenerMarcaTiempo(a));
 
     if (filteredNotes.length === 0) {
       container.innerHTML = `
-        <p style="font-size:13px; color:#9ca3af; font-style:italic; text-align:center; padding:20px;">
-          Este profesional no ha guardado anotaciones para el estudiante.
+        <p class="notes-empty-state">
+          Todavía no existen anotaciones registradas para este estudiante.
         </p>`;
       return;
     }
 
-    container.innerHTML = filteredNotes.map((nota) => `
-      <div class="note-item">
-        <div>
-          <p>${escapeHTML(nota.texto)}</p>
-          <span style="font-size:10px; color:#9ca3af; display:block; margin-top:4px;">
-            Registrado el: ${escapeHTML(nota.fecha)}${nota.hora ? ` - ${escapeHTML(nota.hora)}` : ''}
-          </span>
-        </div>
-      </div>
-    `).join('');
+    container.innerHTML = filteredNotes.map((nota) => {
+      const nombreProfesional = obtenerNombreProfesional(nota);
+      const fechaCompleta = obtenerFechaVisible(nota);
+
+      return `
+        <article class="note-item">
+          <div class="note-content">
+            <div class="note-meta">
+              <strong class="note-author">${escapeHTML(nombreProfesional)}</strong>
+              <span class="note-date">${escapeHTML(fechaCompleta)}</span>
+            </div>
+            <p>${escapeHTML(nota.texto)}</p>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  function obtenerNombreProfesional(nota) {
+    return (
+      nota.psicologoNombre ||
+      nota.profesionalNombre ||
+      nota.autorNombre ||
+      'Profesional no identificado'
+    );
+  }
+
+  function obtenerFechaVisible(nota) {
+    if (nota.fecha) {
+      return `${nota.fecha}${nota.hora ? ` · ${nota.hora}` : ''}`;
+    }
+
+    if (nota.creadoEn) {
+      const fecha = new Date(nota.creadoEn);
+
+      if (!Number.isNaN(fecha.getTime())) {
+        return fecha.toLocaleString('es-PA', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    }
+
+    return 'Fecha no disponible';
+  }
+
+  function obtenerMarcaTiempo(nota) {
+    if (nota.creadoEn) {
+      const marca = new Date(nota.creadoEn).getTime();
+      if (!Number.isNaN(marca)) return marca;
+    }
+
+    return Number(String(nota.id || '').replace(/\D/g, '')) || 0;
   }
 
   function mostrarPanel(panelId) {
