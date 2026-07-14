@@ -79,9 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     usuariosRegistrados.push(nuevoEstudiante);
     localStorage.setItem(USUARIOS_KEY, JSON.stringify(usuariosRegistrados));
+    form.reset();
 
-    sessionStorage.setItem(REGISTRO_EXITOSO_KEY, JSON.stringify({ cedula }));
-    window.location.href = 'login.html';
+    mostrarModalExito({
+      titulo: '¡Estudiante registrado!',
+      mensaje: 'La cuenta estudiantil fue creada correctamente.',
+      detalles: [
+        { etiqueta: 'Nombre', valor: `${nombre} ${apellido}` },
+        { etiqueta: 'Cédula', valor: cedula },
+        { etiqueta: 'Correo', valor: correo }
+      ],
+      textoBoton: 'Ir al inicio de sesión',
+      alConfirmar: () => {
+        sessionStorage.setItem(REGISTRO_EXITOSO_KEY, JSON.stringify({ cedula }));
+        window.location.href = 'login.html';
+      }
+    });
   });
 
   function mostrarError(mensaje) {

@@ -1,0 +1,145 @@
+.app-success-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.42);
+  backdrop-filter: blur(3px);
+}
+
+.app-success-overlay.is-visible {
+  display: flex;
+}
+
+body.app-modal-open {
+  overflow: hidden;
+}
+
+.app-success-dialog {
+  width: min(100%, 430px);
+  padding: 30px 26px 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(17, 24, 39, 0.24);
+  text-align: center;
+  animation: appSuccessEnter 180ms ease-out;
+}
+
+.app-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 18px;
+  border: 2px solid #65d993;
+  border-radius: 50%;
+  background: #ecfdf3;
+  color: #111827;
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.app-success-title {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: clamp(24px, 4vw, 30px);
+  line-height: 1.2;
+}
+
+.app-success-message {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.app-success-details {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 16px 18px;
+  border-radius: 15px;
+  background: #f3f5ff;
+  text-align: left;
+}
+
+.app-success-details[hidden] {
+  display: none;
+}
+
+.app-success-detail-row {
+  display: grid;
+  grid-template-columns: minmax(95px, auto) 1fr;
+  gap: 12px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.app-success-detail-label {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.app-success-detail-value {
+  color: #1f2937;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.app-success-button {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: 13px;
+  background: #5146e5;
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.app-success-button:hover {
+  background: #4338ca;
+}
+
+.app-success-button:active {
+  transform: translateY(1px);
+}
+
+.app-success-button:focus-visible {
+  outline: 3px solid rgba(81, 70, 229, 0.28);
+  outline-offset: 3px;
+}
+
+@keyframes appSuccessEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .app-success-dialog {
+    padding: 26px 20px 20px;
+    border-radius: 18px;
+  }
+
+  .app-success-detail-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

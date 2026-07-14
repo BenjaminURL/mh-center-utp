@@ -78,7 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(USUARIOS_KEY, JSON.stringify(usuariosRegistrados));
 
     form.reset();
-    successBox.textContent = `Colaborador registrado. Cédula: ${cedula} | Contraseña: ${password}`;
+    successBox.textContent = '';
+
+    mostrarModalExito({
+      titulo: '¡Colaborador registrado!',
+      mensaje: 'La cuenta del nuevo psicólogo fue creada correctamente.',
+      detalles: [
+        { etiqueta: 'Nombre', valor: `${nombre} ${apellido}` },
+        { etiqueta: 'Cédula', valor: cedula },
+        { etiqueta: 'Correo', valor: correo }
+      ],
+      textoBoton: 'Volver al panel',
+      alConfirmar: () => {
+        window.location.href = 'directora.html';
+      }
+    });
   });
 
   function normalizarCedula(valor) {

@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const slots = Array.from(document.querySelectorAll(".slot"));
   const saveButton = document.getElementById("saveAvailability");
-  const successModal = document.getElementById("successModal");
-  const closeModal = document.getElementById("closeModal");
   const prevWeekBtn = document.getElementById("prevWeek");
   const nextWeekBtn = document.getElementById("nextWeek");
   const weekLabel = document.getElementById("weekLabel");
@@ -252,12 +250,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   saveButton.addEventListener("click", () => {
     saveWeekSelections();
-    window.location.href = usuarioActivo.rol === "directora" ? "directora.html" : "psicologo.html";
-  });
 
-  closeModal.addEventListener("click", () => successModal.classList.remove("show"));
-  successModal.addEventListener("click", e => {
-    if (e.target === successModal) successModal.classList.remove("show");
+    mostrarModalExito({
+      titulo: '¡Disponibilidad guardada!',
+      mensaje: 'Los días y horarios seleccionados se actualizaron correctamente.',
+      detalles: [
+        { etiqueta: 'Profesional', valor: getPsychologistName() },
+        { etiqueta: 'Cédula', valor: usuarioActivo.cedula },
+        { etiqueta: 'Semana', valor: weekLabel.textContent }
+      ],
+      textoBoton: 'Volver al panel',
+      alConfirmar: () => {
+        window.location.href = usuarioActivo.rol === "directora"
+          ? "directora.html"
+          : "psicologo.html";
+      }
+    });
   });
 
   updateWeekView();
